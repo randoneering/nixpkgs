@@ -6485,6 +6485,12 @@
     github = "DimitarNestorov";
     githubId = 8790386;
   };
+  dzervas = {
+    name = "Dimitris Zervas";
+    email = "dzervas@dzervas.gr";
+    github = "dzervas";
+    githubId = 1029195;
+  };
   diniamo = {
     name = "diniamo";
     email = "diniamo53@gmail.com";
@@ -21393,6 +21399,12 @@
     email = "randomdude16671@proton.me";
     github = "randomdude16671";
     githubId = 210965013;
+  };
+  randoneering = {
+    name = "randoneering";
+    email = "justin@randoneering.tech";
+    github = "randoneering";
+    githubId = 127273550;
   };
   rane = {
     name = "Rane";
