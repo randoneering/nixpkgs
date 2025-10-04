@@ -16,18 +16,11 @@
 
 # When adding a kernel:
 # - Update packageAliases.linux_latest to the latest version
-# - Update the rev in ../os-specific/linux/kernel/linux-libre.nix to the latest one.
 # - Update linux_latest_hardened when the patches become available
 
 with linuxKernel;
 
 let
-  deblobKernel =
-    kernel:
-    callPackage ../os-specific/linux/kernel/linux-libre.nix {
-      linux = kernel;
-    };
-
   markBroken =
     drv:
     drv.overrideAttrs (
@@ -218,6 +211,14 @@ in
           ];
         };
 
+        linux_6_17 = callPackage ../os-specific/linux/kernel/mainline.nix {
+          branch = "6.17";
+          kernelPatches = [
+            kernelPatches.bridge_stp_helper
+            kernelPatches.request_key_helper
+          ];
+        };
+
         linux_testing =
           let
             testing = callPackage ../os-specific/linux/kernel/mainline.nix {
@@ -282,15 +283,14 @@ in
           ];
         };
 
-        linux_libre = deblobKernel packageAliases.linux_default.kernel;
-
-        linux_latest_libre = deblobKernel packageAliases.linux_latest.kernel;
-
         linux_6_12_hardened = hardenedKernelFor kernels.linux_6_12 { };
 
         linux_hardened = hardenedKernelFor packageAliases.linux_default.kernel { };
       }
       // lib.optionalAttrs config.allowAliases {
+        linux_libre = throw "linux_libre has been removed due to lack of maintenance";
+        linux_latest_libre = throw "linux_latest_libre has been removed due to lack of maintenance";
+
         linux_4_19 = throw "linux 4.19 was removed because it will reach its end of life within 24.11";
         linux_6_9 = throw "linux 6.9 was removed because it has reached its end of life upstream";
         linux_6_10 = throw "linux 6.10 was removed because it has reached its end of life upstream";
@@ -737,6 +737,7 @@ in
     linux_6_6 = recurseIntoAttrs (packagesFor kernels.linux_6_6);
     linux_6_12 = recurseIntoAttrs (packagesFor kernels.linux_6_12);
     linux_6_16 = recurseIntoAttrs (packagesFor kernels.linux_6_16);
+    linux_6_17 = recurseIntoAttrs (packagesFor kernels.linux_6_17);
   }
   // lib.optionalAttrs config.allowAliases {
     linux_4_19 = throw "linux 4.19 was removed because it will reach its end of life within 24.11"; # Added 2024-09-21
@@ -782,12 +783,10 @@ in
       linux_xanmod = recurseIntoAttrs (packagesFor kernels.linux_xanmod);
       linux_xanmod_stable = recurseIntoAttrs (packagesFor kernels.linux_xanmod_stable);
       linux_xanmod_latest = recurseIntoAttrs (packagesFor kernels.linux_xanmod_latest);
-
-      linux_libre = recurseIntoAttrs (packagesFor kernels.linux_libre);
-
-      linux_latest_libre = recurseIntoAttrs (packagesFor kernels.linux_latest_libre);
     }
     // lib.optionalAttrs config.allowAliases {
+      linux_libre = throw "linux_libre has been removed due to lack of maintenance";
+      linux_latest_libre = throw "linux_latest_libre has been removed due to lack of maintenance";
 
       linux_5_10_hardened = throw "linux_hardened on nixpkgs only contains latest stable and latest LTS";
       linux_5_15_hardened = throw "linux_hardened on nixpkgs only contains latest stable and latest LTS";
@@ -809,7 +808,7 @@ in
   packageAliases = {
     linux_default = packages.linux_6_12;
     # Update this when adding the newest kernel major version!
-    linux_latest = packages.linux_6_16;
+    linux_latest = packages.linux_6_17;
     linux_rt_default = packages.linux_rt_5_15;
     linux_rt_latest = packages.linux_rt_6_6;
   }
